@@ -54,44 +54,49 @@ def display_main_menu(window):
     # Combobox
     cb = ttk.Combobox(window, values=types)
     cb.set("Search Type")
-    cb.grid(row=2, column=3)
+    cb.grid(row=2, column=2, pady=5)
 
     search_button = tk.Button(window, text="Search",  command=lambda: search_catalog(window,cb,search_field))
-    search_button.grid(row=2, column=4, pady=5)
+    search_button.grid(row=2, column=3, pady=5)
 
     #add new entry button
-    new_entry_button = tk.Button(window, text="Add entry",command=lambda: display_add_entry(window))
+    new_entry_button = tk.Button(window, text="Add Entry",command=lambda: display_add_entry(window))
     new_entry_button.grid(row=3, column=0, pady=5)
 
     #add view label
     view_cat_button = tk.Button(window, text="View Catalog", command=lambda: view_catalog(window))
     view_cat_button.grid(row=4, column=0, pady=5)
 
+    #add delete label
+    delete_button = tk.Button(window, text="Delete Entry", command=lambda: delete_entry(window,cb,search_field))
+    delete_button.grid(row=2, column=4, pady=5)
+
 def view_catalog(window):
     df = Queries.get_catalog()
 
-    tree = ttk.Treeview(window, selectmode="browse")
+    tree = ttk.Treeview(window, selectmode="browse", height=10)
+
     tree["columns"] = list(df.columns)
     for col in df.columns:
-        tree.column(col, width=100)
+        tree.column(col, width=100, stretch=False)
         tree.heading(col, text=col)
     for index, row in df.iterrows():
         tree.insert("", "end", values=list(row))
-    tree.grid(row=5, columnspan=2)
 
-    # Create vertical scrollbar
-    vsb = ttk.Scrollbar(window, orient="vertical", command=tree.yview)
+    # Create a Scrollbar
+    y_scrollbar = ttk.Scrollbar(tree, orient="vertical", command=tree.yview,style="My.Vertical.TScrollbar")
+    x_scrollbar = ttk.Scrollbar(tree, orient="horizontal", command=tree.xview)
 
-    # Create horizontal scrollbar
-    hsb = ttk.Scrollbar(window, orient="horizontal", command=tree.xview)
+    # Configure the Treeview to use the scrollbar
+    tree.configure(yscrollcommand=y_scrollbar.set)
+    tree.configure(xscrollcommand=x_scrollbar.set)
 
-    # Configure Treeview to use scrollbars
-    tree.configure(yscrollcommand=vsb.set, xscrollcommand=hsb.set)
+    # Place the scrollbar on the right side of the Treeview
+    y_scrollbar.grid()
+    x_scrollbar.grid()
 
     # Place widgets using grid layout
-    tree.grid(row=6, column=0, columnspan=2, sticky="nsew")
-    vsb.grid(row=6, column=2, sticky="ns")
-    hsb.grid(row=7, column=0, columnspan=2, sticky="ew")
+    tree.grid(row=6, column=0, columnspan=5, sticky="nsew")
 
 def display_add_entry(window):
     print("---add entry---")
@@ -102,42 +107,42 @@ def display_add_entry(window):
     display_exogorth()
 
     title_label = tk.Label(window, text="Title", anchor="center",fg="white", bg="black")
-    title_label.grid(row=0, column=0,pady=1)
+    title_label.grid(row=2, column=0,pady=1)
     title_entry = tk.Entry(window, width=30, justify="center")
-    title_entry.grid(row=0, column=1,pady=1)
+    title_entry.grid(row=2, column=1,pady=1)
 
     author_label = tk.Label(window, text="Author", anchor="center",fg="white", bg="black")
-    author_label.grid(row=1, column=0,pady=1)
+    author_label.grid(row=3, column=0,pady=1)
     author_entry = tk.Entry(window, width=30, justify="center")
-    author_entry.grid(row=1, column=1,pady=1)
+    author_entry.grid(row=3, column=1,pady=1)
 
     pub_year_label = tk.Label(window, text="PubYear", anchor="center",fg="white", bg="black")
-    pub_year_label.grid(row=2, column=0,pady=1)
+    pub_year_label.grid(row=4, column=0,pady=1)
     pub_year_entry = tk.Entry(window, width=30, justify="center")
-    pub_year_entry.grid(row=2, column=1,pady=1)
+    pub_year_entry.grid(row=4, column=1,pady=1)
 
     genre_label = tk.Label(window, text="Genre", anchor="center",fg="white", bg="black")
-    genre_label.grid(row=3, column=0,pady=1)
+    genre_label.grid(row=5, column=0,pady=1)
     genre_entry = tk.Entry(window, width=30, justify="center")
-    genre_entry.grid(row=3, column=1,pady=1)
+    genre_entry.grid(row=5, column=1,pady=1)
 
     rating_label = tk.Label(window, text="Rating", anchor="center",fg="white", bg="black")
-    rating_label.grid(row=4, column=0,pady=1)
+    rating_label.grid(row=6, column=0,pady=1)
     rating_scale = tk.Scale(window, from_=1, to=5, orient='horizontal')
-    rating_scale.grid(row=4, column=1,pady=1)
+    rating_scale.grid(row=6, column=1,pady=1)
 
     note_label = tk.Label(window, text="Note", anchor="center",fg="white", bg="black")
-    note_label.grid(row=5, column=0,pady=1)
+    note_label.grid(row=7, column=0,pady=1)
     note_entry = tk.Text(window, height=5, width=30)
-    note_entry.grid(row=5, column=1,pady=1)
+    note_entry.grid(row=7, column=1,pady=1)
 
     # add main menu button
     mm_button = tk.Button(window, text="Main Menu", command=lambda: display_main_menu(window))
-    mm_button.grid(row=6, column=2, pady=5)
+    mm_button.grid(row=8, column=2, pady=5)
 
     input_fields = [title_entry, author_entry, pub_year_entry, genre_entry, rating_scale, note_entry]
     submit_button = tk.Button(window, text="Submit", command=lambda: get_input(window, input_fields))
-    submit_button.grid(row=6, column=1, pady=5)
+    submit_button.grid(row=8, column=1, pady=5)
 
 def get_input(window, input_fields):
     print("---get new entry input---")
@@ -161,7 +166,7 @@ def search_catalog(window, type_field, search_field):
     search_string = "'%" + str(search_field.get()) + "%'"
     type_string = str(type_field.get())
     df = Queries.search_db(type_string, search_string)
-
+    display_main_menu(window)
     tree = ttk.Treeview(window, selectmode="browse")
     tree["columns"] = list(df.columns)
     for col in df.columns:
@@ -169,18 +174,30 @@ def search_catalog(window, type_field, search_field):
         tree.heading(col, text=col)
     for index, row in df.iterrows():
         tree.insert("", "end", values=list(row))
-    tree.grid(row=5, columnspan=2)
 
     # Create vertical scrollbar
-    vsb = ttk.Scrollbar(window, orient="vertical", command=tree.yview)
+    # vsb = ttk.Scrollbar(window, orient="vertical", command=tree.yview)
 
     # Create horizontal scrollbar
-    hsb = ttk.Scrollbar(window, orient="horizontal", command=tree.xview)
+    # hsb = ttk.Scrollbar(window, orient="horizontal", command=tree.xview)
 
     # Configure Treeview to use scrollbars
-    tree.configure(yscrollcommand=vsb.set, xscrollcommand=hsb.set)
+    # tree.configure(yscrollcommand=vsb.set, xscrollcommand=hsb.set)
 
     # Place widgets using grid layout
     tree.grid(row=6, column=0, columnspan=2, sticky="nsew")
-    vsb.grid(row=6, column=2, sticky="ns")
-    hsb.grid(row=7, column=0, columnspan=2, sticky="ew")
+    # vsb.grid(row=6, column=2, sticky="ns")
+    # hsb.grid(row=7, column=0, columnspan=2, sticky="ew")
+
+def delete_entry(window, type_field, search_field):
+    result = ""
+    result_label = tk.Label(window, text=result, anchor="center", fg="white", bg="black")
+    result_label.grid(row=10, column=0, pady=1)
+
+
+    delete_string = "'%" + str(search_field.get()) + "%'"
+    type_string = str(type_field.get())
+    result = Queries.delete_entry_from_db(type_string, delete_string)
+
+    result_label.config(text=result)
+

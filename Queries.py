@@ -52,7 +52,7 @@ def csv_to_db():
         conn.commit()
 
         #get panda dataframe from csv
-        df = pd.read_csv(CSV_FILE, delimiter="|")
+        df = pd.read_csv(CSV_FILE, delimiter="|", dtype={"PubYear":str})
 
         #insert dataframe into db
         df.to_sql("Catalog", conn, if_exists='replace', index=False)
@@ -125,3 +125,36 @@ def search_db(type_string, search_string):
         conn.close()
 
     return df
+
+def delete_entry_from_db(type_string, search_string):
+    print("---delete entry from db---")
+    search_query = f"SELECT * FROM Catalog WHERE {type_string} LIKE {search_string};"
+    delete_query = f"DELETE FROM Catalog WHERE {type_string} = {search_string};"
+
+    conn = None
+    df = None
+    try:
+        conn = sqlite3.connect(DB_FILE)
+        cursor = conn.cursor()
+        cursor.execute(search_query)
+
+        row_count = len(cursor.fetchall())
+
+        if row_count == 0:
+            conn.close()
+            return "Could not find item. View catalog and enter exact data value."
+
+        elif row_count > 1:
+            conn.close()
+            return "Found more than one item that matches. View catalog and enter exact data value."
+
+        else:
+            cursor.execute(delete_query)
+
+    except sqlite3.Error as error:
+        print(f"SQLite error: {error}")
+        conn.rollback()
+        return "Could not delete item from database."
+    finally:
+        conn.close()
+    return "Successfully deleted item from database."
